@@ -51,43 +51,29 @@ C <- getSymbols("C", from = start_date, auto.assign = F)[,4]
 
 #Make a data frame with your tickers prices
 tickers <- cbind.data.frame(AAPL,MSFT,AMZN,GOOGL,ADBE,ORCL,SAP,NVDA,CSCO,QCOM,VMW,HTHIY,CRM,IBM,CTSH,JPM,MA,AMD,INTC,MS,GS,WMT,AXP,BAC,C)
-# ,BABA,BRKA,V,ADBE,ORCL,SAP,SFTBY,VZ,QCOM,VMW,UBER,HTHIY,HNHAF,TWTR,TCEHY,CRM,IBM,ADSK,XIACF,CTSH)
 
-#Turn that data frame into timeseries class data 
-
-
-portfolioReturns <- as.timeSeries(tickers)
-
-stock_series = portfolioReturns
+stock_series <- as.timeSeries(tickers)
 
 daily_price        <- stock_series %>% as.data.frame()
 daily_price        <- daily_price[colSums(is.na(daily_price)) < 100] %>% 
   na.locf(na.rm = FALSE) %>% 
   xts(order.by = as.Date(rownames(daily_price)))
 
-write.csv(as.data.frame(daily_price),"daily_price.csv")
-
 
 daily_log_ret<- Return.calculate(xts(daily_price), method = "log")[-1,] %>% timeSeries::timeSeries()
 xts_monthly_nav <- to.monthly(xts(daily_price), indexAt = "last", OHLC = FALSE)
-daily_log_ret<- Return.calculate(xts_monthly_nav, method = "log")[-1,] %>% timeSeries::timeSeries()
+monthly_log_ret<- Return.calculate(xts_monthly_nav, method = "log")[-1,] %>% timeSeries::timeSeries()
 
 Spec = portfolioSpec()
 setRiskFreeRate(Spec)<-0.02
 
 
 #Make & plot efficent frontier
-efficient_frontier <- portfolioFrontier(daily_log_ret,Spec, constraints = "longOnly")
+efficient_frontier <- portfolioFrontier(monthly_log_ret,Spec, constraints = "longOnly")
 tailoredFrontierPlot(efficient_frontier)
 #frontierPlot(efficient_frontier,  frontier = c("both", "lower", "upper"), col = c("black", "grey"), add = FALSE, labels = TRUE, return = c("mean", "mu"), risk = c("Cov", "Sigma", "CVaR", "VaR"), auto = TRUE, title = TRUE)
 #plot(efficient_frontier,c(1,2,3))
-#get the efficient frontier weights
-#frontier_weights <- getWeights(efficient_frontier)
-#View(frontier_weights)
-
 #frontierPlot(efficient_frontier,pch=19,col = c('blue','light blue'),add = T);
 
-#get minimum variance portfolio
-minvariancePortfolio(daily_log_ret, constraints = "longOnly")
-tangencyPortfolio(daily_log_ret, constraints = "longOnly")
-#portfolioData()
+minvariancePortfolio(monthly_log_ret, constraints = "longOnly")
+tangencyPortfolio(monthly_log_ret, constraints = "longOnly")
