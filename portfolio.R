@@ -108,7 +108,14 @@ tailoredFrontierPlot(efficient_frontier)
 
 # frontierPlot(efficient_frontier,  frontier = c("both", "lower", "upper"), col = c("black", "grey"), add = FALSE, labels = TRUE, return = c("mean", "mu"), risk = c("Cov", "Sigma", "CVaR", "VaR"), auto = TRUE, title = TRUE)
 # plot(efficient_frontier,c(1,2,3))
-# get the efficient frontier weights
+
+
+# Find the efficient frontier weights
+
+
+# Unutilised code segment
+
+
 # frontier_weights <- getWeights(efficient_frontier)
 # View(frontier_weights)
 # frontierPlot(efficient_frontier,pch=19,col = c('blue','light blue'),add = T);
